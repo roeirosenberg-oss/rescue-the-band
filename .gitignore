@@ -1,0 +1,4 @@
+music/stems/
+*.wav
+__pycache__/
+.DS_Store

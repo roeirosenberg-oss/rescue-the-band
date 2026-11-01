@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rescue the Band</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{--u:3px;--ink:#07050d;--panel:#140c22;--line:#4fe3ff;--pink:#ff3fa4;--gold:#ffd34f}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);overflow:hidden}
+body{display:flex;align-items:center;justify-content:center;font-family:'Press Start 2P','Courier New',monospace;color:#f4f0ea}
+#wrap{position:relative;width:1152px;height:648px}
+#game{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block;background:#000}
+.screen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(7,5,13,.82);overflow:auto;padding:calc(var(--u)*6)}
+.screen.on{display:flex}
+#scr-menu{background:linear-gradient(rgba(7,5,13,.25),rgba(7,5,13,.65))}
+.panel{background:var(--panel);border:calc(var(--u)*1) solid #2c1f44;box-shadow:0 0 0 calc(var(--u)*1) #000,inset 0 0 0 calc(var(--u)*1) #3a2a5a;padding:calc(var(--u)*7) calc(var(--u)*9);max-width:calc(var(--u)*330);width:100%;max-height:100%;overflow:auto}
+h1{font-size:calc(var(--u)*13);margin:0 0 calc(var(--u)*3);color:var(--gold);text-shadow:calc(var(--u)*1) calc(var(--u)*1) 0 #b0206a,calc(var(--u)*2) calc(var(--u)*2) 0 #000;text-align:center;line-height:1.3}
+h2{font-size:calc(var(--u)*8);margin:0 0 calc(var(--u)*5);color:var(--line);text-align:center}
+h3{font-size:calc(var(--u)*5);color:var(--gold);margin:calc(var(--u)*5) 0 calc(var(--u)*2)}
+p,li,td,th,label,.small{font-size:calc(var(--u)*4);line-height:1.7}
+.sub{text-align:center;color:#cbb8ff;margin:0 0 calc(var(--u)*6)}
+.menu{display:flex;flex-direction:column;gap:calc(var(--u)*2.4);align-items:stretch;max-width:calc(var(--u)*170);margin:0 auto}
+.row{display:flex;gap:calc(var(--u)*3);flex-wrap:wrap;justify-content:center;margin-top:calc(var(--u)*5)}
+button{font-family:inherit;font-size:calc(var(--u)*4.4);color:#fff;background:#2b1d48;border:0;padding:calc(var(--u)*3.2) calc(var(--u)*5);cursor:pointer;box-shadow:inset 0 calc(var(--u)*-1) 0 #1a0f2e,0 0 0 calc(var(--u)*.7) #000;text-transform:uppercase}
+button:hover,button:focus-visible{background:var(--pink);outline:none}
+button.primary{background:#b0206a}
+button.primary:hover{background:var(--gold);color:#000}
+.camstat{text-align:center;font-size:calc(var(--u)*3.4);color:#999;margin-top:calc(var(--u)*4)}
+.camstat.ready{color:#7f7}.camstat.error{color:#f77}.camstat.loading{color:#ff4}
+table{border-collapse:collapse;width:100%;margin:calc(var(--u)*2) 0}
+td,th{border:calc(var(--u)*.5) solid #3a2a5a;padding:calc(var(--u)*1.6) calc(var(--u)*2.4);text-align:left}
+th{color:var(--line)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*2) calc(var(--u)*8);align-items:center}
+input[type=range]{width:100%;accent-color:var(--pink)}
+input[type=checkbox]{transform:scale(1.4);accent-color:var(--pink);margin-right:calc(var(--u)*2)}
+.val{color:var(--gold)}
+pre{font-size:calc(var(--u)*3.1);white-space:pre-wrap;background:#0b0714;padding:calc(var(--u)*2.4);color:#9cf;margin:calc(var(--u)*2) 0}
+#camBox{position:fixed;left:0;top:0;width:160px;height:120px;transform:scaleX(-1);border:2px solid #000;outline:2px solid #4fe3ff;display:none;background:#000;pointer-events:none;opacity:.92;z-index:5}
+#camBox.inside{opacity:.8}
+#camBox video,#camBox canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#camBtn{position:fixed;left:0;top:0;font-size:11px;padding:5px 8px;display:none;opacity:.85;z-index:6}
+#tip{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(7,5,13,.62);z-index:4}
+#tip.on{display:flex}
+#tip .panel{max-width:calc(var(--u)*240);text-align:center}
+#tip p{margin:0 0 calc(var(--u)*5);font-size:calc(var(--u)*5);line-height:1.8;color:#fff}
+#tipCount{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:calc(var(--u)*44);color:#ffd34f;text-shadow:calc(var(--u)*2) calc(var(--u)*2) 0 #b0206a,calc(var(--u)*3) calc(var(--u)*3) 0 #000;pointer-events:none;z-index:4}
+#tipCount.on{display:flex}
+#tut{position:absolute;left:1.5%;right:1.5%;top:calc(var(--u)*24);display:none;gap:calc(var(--u)*4);align-items:center;background:#140c22ee;border:calc(var(--u)*1) solid #ffd34f;box-shadow:0 0 0 calc(var(--u)*.7) #000;padding:calc(var(--u)*3) calc(var(--u)*4);z-index:3}
+#tut.on{display:flex}
+#tut .tb{flex:1;min-width:0}
+#tut .th{font-size:calc(var(--u)*3.4);color:#ffd34f;margin-bottom:calc(var(--u)*1.5)}
+#tut .th #tutTitle{color:#4fe3ff;margin-left:calc(var(--u)*3)}
+#tutText{margin:0;font-size:calc(var(--u)*4.2);line-height:1.6;color:#fff}
+#tutText.ok{color:#7f7}
+#tutHint{font-size:calc(var(--u)*3);color:#9a8fb8;margin-top:calc(var(--u)*1.5)}
+#tut .tbtns{display:flex;gap:calc(var(--u)*2);margin-top:calc(var(--u)*2)}
+#tut .tbtns button{font-size:calc(var(--u)*3.2);padding:calc(var(--u)*1.6) calc(var(--u)*3)}
+#tutPoses{display:flex;gap:calc(var(--u)*2.5);flex:none}
+.pcard{display:flex;flex-direction:column;align-items:center;background:#0b0714;border:calc(var(--u)*.6) solid #3a2a5a;padding:calc(var(--u)*1.5) calc(var(--u)*2);width:calc(var(--u)*50);text-align:center}
+.pcard canvas{width:calc(var(--u)*30);height:calc(var(--u)*36);image-rendering:pixelated;margin-bottom:calc(var(--u)*1)}
+.pcard b{font-size:calc(var(--u)*2.8)}.pcard b.R{color:#4fe3ff}.pcard b.L{color:#ff7ab8}
+.pcard span{font-size:calc(var(--u)*2.6);color:#fff;margin-top:calc(var(--u)*.6)}
+.pcard em{font-style:normal;font-size:calc(var(--u)*3);color:#ffd34f;margin-top:calc(var(--u)*.6)}
+.pcard small{font-size:calc(var(--u)*2.2);color:#9a8fb8;margin-top:calc(var(--u)*.6)}
+.pcard.match{border-color:#7f7;box-shadow:0 0 calc(var(--u)*2) #7f7}
+.cheat{display:grid;grid-template-columns:repeat(3,auto);gap:calc(var(--u)*1.2)}
+.pcard.small{width:calc(var(--u)*34);padding:calc(var(--u)*.8)}
+.pcard.small canvas{width:calc(var(--u)*16);height:calc(var(--u)*19.2)}
+.pcard.small small{display:none}
+#skipTut{position:absolute;right:calc(var(--u)*3);bottom:calc(var(--u)*3);display:none;z-index:3;font-size:calc(var(--u)*3.4);padding:calc(var(--u)*2) calc(var(--u)*3.2)}
+#calCanvas{width:100%;max-width:calc(var(--u)*200);display:block;margin:0 auto;image-rendering:auto;border:calc(var(--u)*.6) solid #3a2a5a}
+.bar{height:calc(var(--u)*3);background:#2a1d40;margin:calc(var(--u)*3) 0}
+.bar>div{height:100%;width:0;background:var(--gold);transition:width .1s}
+.blink{animation:bl 1s steps(2) infinite}@keyframes bl{50%{opacity:.25}}
+.note{color:#9a8fb8}
+kbd{background:#2b1d48;padding:0 calc(var(--u)*1.2);color:var(--gold)}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" width="384" height="216"></canvas>
+  <div id="tip" role="dialog" aria-modal="true"><div class="panel"><p>Having trouble? You can also use the W, A, S, D keys to move, Space to jump, and J to attack.</p><button id="tipOk" class="primary">OK</button></div></div>
+  <div id="tipCount" aria-live="assertive"></div>
+  <div id="tut"><div class="tb"><div class="th"><span id="tutStep"></span><span id="tutTitle"></span></div><p id="tutText"></p><div id="tutHint"></div><div class="tbtns"><button id="tutNext">NEXT ▸</button><button id="tutCam" class="camtoggle">ENABLE CAMERA</button></div></div><div id="tutPoses"></div></div>
+  <button id="skipTut">SKIP TUTORIAL ▸▸</button>
+
+  <div class="screen on" id="scr-gate">
+    <div class="panel" style="text-align:center">
+      <h1>RESCUE<br>THE BAND</h1>
+      <p class="sub">Monsters kidnapped your bandmates. Grab your mic stand.</p>
+      <p class="blink" style="color:var(--gold)">CLICK OR PRESS ANY KEY</p>
+      <p class="note">This starts the sound. The camera is optional and runs only in your browser.</p>
+    </div>
+  </div>
+
+  <div class="screen" id="scr-menu">
+    <div class="panel">
+      <h1>RESCUE THE BAND</h1>
+      <p class="sub">A two-hand gesture pixel platformer</p>
+      <div class="menu">
+        <button id="btnContinue" class="primary">CONTINUE</button>
+        <button id="btnNew" class="primary">NEW GAME</button>
+        <button id="btnConcert">WATCH FINAL CONCERT</button>
+        <button id="btnTrain">TRAINING ROOM</button>
+        <button class="camtoggle">ENABLE CAMERA</button>
+        <button id="btnCalib">CALIBRATION</button>
+        <button id="btnGest">GESTURE SETTINGS</button>
+        <button id="btnAudio">AUDIO SETTINGS</button>
+        <button id="btnHelp">INSTRUCTIONS</button>
+      </div>
+      <div class="camstat">Camera off</div>
+    </div>
+  </div>
+
+  <div class="screen" id="scr-confirm">
+    <div class="panel" style="text-align:center">
+      <h2>START OVER?</h2>
+      <p>This erases your rescued musicians and checkpoints.</p>
+      <div class="row"><button id="btnYesNew" class="primary">YES, NEW GAME</button><button id="btnNoNew">CANCEL</button></div>
+    </div>
+  </div>
+
+  <div class="screen" id="scr-pause">
+    <div class="panel">
+      <h2 id="pauseTitle">PAUSED</h2>
+      <div class="menu">
+        <button id="btnResume" class="primary">RESUME</button>
+        <button id="btnRestartCp">RESTART FROM CHECKPOINT</button>
+        <button id="btnPauseAudio">AUDIO SETTINGS</button>
+        <button id="btnPauseGest">GESTURE SETTINGS</button>
+        <button id="btnPauseCalib">CALIBRATION</button>
+        <button id="btnPausePreview">HIDE CAMERA PREVIEW</button>
+        <button class="camtoggle">ENABLE CAMERA</button>
+        <button id="btnPauseMenu">MAIN MENU</button>
+      </div>
+      <div class="camstat"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="scr-audio">
+    <div class="panel">
+      <h2>AUDIO SETTINGS</h2>
+      <div class="grid2">
+        <label>MASTER <span class="val" id="vol-master-v"></span></label><input type="range" id="vol-master" min="0" max="100">
+        <label>MUSIC <span class="val" id="vol-music-v"></span></label><input type="range" id="vol-music" min="0" max="100">
+        <label>SFX <span class="val" id="vol-sfx-v"></span></label><input type="range" id="vol-sfx" min="0" max="100">
+        <label>VOICE <span class="val" id="vol-voice-v"></span></label><input type="range" id="vol-voice" min="0" max="100">
+        <label>AMBIENT <span class="val" id="vol-ambient-v"></span></label><input type="range" id="vol-ambient" min="0" max="100">
+        <label><input type="checkbox" id="vol-mute">MUTE ALL</label><span></span>
+      </div>
+      <div class="row"><button id="testMusic">TEST MUSIC</button><button id="testSfx">TEST SFX</button><button id="testVoice">TEST VOICE</button><button id="testAmb">TEST AMBIENT</button></div>
+      <p class="note">Settings are saved in this browser. (Test sounds don't play while the game is paused.)</p>
+      <div class="row"><button class="backbtn primary">BACK</button></div>
+    </div>
+  </div>
+
+  <div class="screen" id="scr-gesture">
+    <div class="panel">
+      <h2>GESTURE SETTINGS</h2>
+      <table>
+        <tr><th>HAND</th><th>OPEN PALM</th><th>CLOSED FIST</th><th>FIST + INDEX</th></tr>
+        <tr><td>RIGHT (MOVE)</td><td>STOP</td><td>WALK RIGHT &gt;</td><td>&lt; WALK LEFT</td></tr>
+        <tr><td>LEFT (ACTION)</td><td>NO ACTION</td><td>ATTACK</td><td>JUMP</td></tr>
+      </table>
+      <div class="grid2">
+        <label>RIGHT HAND SENSITIVITY <span class="val" id="g-sensR-v"></span></label><input type="range" id="g-sensR" min="0" max="100">
+        <label>LEFT HAND SENSITIVITY <span class="val" id="g-sensL-v"></span></label><input type="range" id="g-sensL" min="0" max="100">
+        <label>STABILITY <span class="val" id="g-stab-v"></span></label><input type="range" id="g-stab" min="2" max="8">
+        <label>TRACKING-LOSS GRACE <span class="val" id="g-loss-v"></span></label><input type="range" id="g-loss" min="100" max="600" step="25">
+        <label><input type="checkbox" id="g-swap">SWAP HANDEDNESS</label><label><input type="checkbox" id="g-preview">SHOW PREVIEW</label>
+        <label><input type="checkbox" id="g-lm">SHOW LANDMARKS</label><span></span>
+      </div>
+      <p class="note">Higher sensitivity = fists register more easily. Lower = open/pointing fingers register more easily. Stability = how many matching frames are needed before a gesture counts.</p>
+      <pre id="g-live"></pre>
+      <div class="row"><button class="camtoggle">ENABLE CAMERA</button><button id="g-calib">CALIBRATE</button><button id="g-resetR">RESET RIGHT</button><button id="g-resetL">RESET LEFT</button></div>
+      <div class="camstat"></div>
+      <div class="row"><button class="backbtn primary">BACK</button></div>
+    </div>
+  </div>
+
+  <div class="screen" id="scr-calibration">
+    <div class="panel">
+      <h2>CALIBRATION <span id="calStep" class="val"></span></h2>
+      <canvas id="calCanvas" width="480" height="360"></canvas>
+      <p id="calText" style="text-align:center;color:var(--gold)"></p>
+      <p id="calInfo" style="text-align:center"></p>
+      <div class="bar"><div id="calProg"></div></div>
+      <div class="row"><button id="calEnable" class="primary">ENABLE CAMERA</button><button id="calSwap" style="display:none" class="primary">SWAP HANDS</button><button id="calSkip">SKIP STEP</button><button id="calRestart">RESTART</button><button class="backbtn">DONE / BACK</button></div>
+    </div>
+  </div>
+
+  <div class="screen" id="scr-help">
+    <div class="panel">
+      <h2>INSTRUCTIONS</h2>
+      <p>You are <b>NOVA</b>, lead singer. Monsters locked your band in cages across three stages. In each stage: find the <b>key guardian</b>, defeat it, grab the <b>key</b> it drops, walk back to the <b>cage</b> and stand at it to unlock. Your freed bandmates play their part, then the exit opens. Free all five musicians for the final concert.</p>
+      <table>
+        <tr><th>STAGE</th><th>CAPTIVES</th></tr>
+        <tr><td>1 IVORY HALLS</td><td>MINA (KEYS) + VOLT (ELECTRONICS)</td></tr>
+        <tr><td>2 LOW-END CAVERNS</td><td>DEX (BASS) + RIFF (GUITAR)</td></tr>
+        <tr><td>3 THUNDER CITADEL</td><td>BO (DRUMS) — FINAL BOSS</td></tr>
+      </table>
+      <h3>TWO-HAND CONTROLS</h3>
+      <table>
+        <tr><th></th><th>OPEN PALM</th><th>FIST</th><th>FIST + INDEX</th></tr>
+        <tr><td>RIGHT HAND</td><td>STAND STILL</td><td>WALK RIGHT</td><td>WALK LEFT</td></tr>
+        <tr><td>LEFT HAND</td><td>NOTHING</td><td>SWING MIC STAND</td><td>JUMP</td></tr>
+      </table>
+      <p>Each left-hand action fires once. To repeat it, change gesture (for example open your palm) and make it again. Both hands work at the same time. Face the camera with good light, hands about 50cm away. Run <b>Calibration</b> once for best results.</p>
+      <h3>KEYBOARD</h3>
+      <p><kbd>A</kbd>/<kbd>D</kbd> or <kbd>&larr;</kbd>/<kbd>&rarr;</kbd> move · <kbd>SPACE</kbd> jump · <kbd>J</kbd> attack · <kbd>E</kbd> unlock now · <kbd>ESC</kbd> pause · <kbd>C</kbd> hide/show camera · <kbd>H</kbd> take damage (training)</p>
+      <div class="row"><button class="backbtn primary">BACK</button></div>
+    </div>
+  </div>
+
+  <div class="screen" id="scr-concertEnd">
+    <div class="panel" style="text-align:center">
+      <h1>THE BAND IS BACK!</h1>
+      <p class="sub">All five musicians rescued. What a show.</p>
+      <div class="row"><button id="btnReplay" class="primary">REPLAY CONCERT</button><button id="btnEndNew">PLAY AGAIN</button><button id="btnEndMenu">MAIN MENU</button></div>
+    </div>
+  </div>
+</div>
+<div id="camBox"><video id="camVideo" playsinline muted></video><canvas id="camOverlay" width="320" height="240"></canvas></div>
+<button id="camBtn">HIDE CAM</button>
+<script>
+/*__JS__*/
+</script>
+<script>
+/*__AUDIO__*/
+</script>
+</body>
+</html>
